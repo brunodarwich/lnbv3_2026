@@ -127,8 +127,13 @@ def main():
     
     try:
         # 1. Injeção de Dependência (Composition Root)
-        # Tenta obter credenciais dos secrets ou usa arquivo local (tratado no serviço)
-        creds_dict = st.secrets.get("gcp_service_account")
+        # Tenta obter credenciais de st.secrets (com fallback para raiz)
+        creds_dict = None
+        if "gcp_service_account" in st.secrets:
+            creds_dict = st.secrets["gcp_service_account"]
+        elif "private_key" in st.secrets:
+            creds_dict = st.secrets
+            
         sheets_service = GoogleSheetsService(credentials_dict=creds_dict)
         data_loader = DataLoader(sheets_service)
         
